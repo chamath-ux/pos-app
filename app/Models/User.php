@@ -97,7 +97,7 @@ class User extends Authenticatable
 
       public function getUserIdAttribute()
       {
-        return $this->id;
+        return $this->id; 
       }
 
       public function role()
