@@ -42,17 +42,17 @@ class RoleService
             $role->role_id = $request->roleId;
             $role->save();
 
-            return $this->sendResponse(new UserResource($role), 'Successfully.Updated');
+            return successMessage('Successfully Updated');
 
             }catch(InvalidTokenException $e){
 
                 Log::info('Error in RoleController create:'.$e);
-                return $this->sendError('Token not valid','',500);
+                return errorMessage('Token not valid',500);
 
             }catch(Exception $e)
             {
                 Log::info('Error in RoleController create:'.$e->getMessage());
-                return $this->sendError($e->getMessage(),'',500);
+                return errorMessage($e->getMessage(),500);
             }
     }
 

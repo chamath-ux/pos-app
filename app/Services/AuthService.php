@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Permission;
+use Illuminate\Support\Facades\Log;
+use App\Http\Resources\AuthResource;
 use Illuminate\Support\Facades\Auth;
 
 class AuthService
@@ -13,55 +16,67 @@ class AuthService
      * Get Authenticated user data
      * @return array
      */
-    public function getAuthUser()
+    public function authUser($request)
     {
-        $success['token'] =  auth()->user()->createToken('MyApp',[''],now()->addWeek())->plainTextToken;
-        $success['login_user'] =  Auth::user()->id;
-        $success['user_role'] = auth()->user()->getRole();
-        $success['rolePermissions']=$this->userRolePermissions();
-        $success['userPermissions'] =$this->userPermissions();
+        try{
 
-        return $success;
+            if(!Auth::attempt($request->all()))
+            {
+                throw new Exception('Credentials not matching');
+            }
+
+            $user['token']=auth()->user()->createToken('MyApp',[''],now()->addWeek())->plainTextToken;
+
+            return successResponse($user);
+
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in AuthController register:'.$e);
+            return errorMessage($e->getMessage(),500);
+        }
     }
 
     /**
-     * get the user assign role permissions
-     *@return array
+     * new user register
+     * @return void
      */
 
-    public function userRolePermissions()
+     public function registerUser($request)
+     {
+        try{
+
+            $user = User::create($request->all());
+
+            if(!$user)
+            {
+                throw new Exception('Error on user registration');
+            }
+
+            return successMessage('Successfully Register');
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in AuthController register:'.$e);
+            return errorMessage($e->getMessage(),500);
+        }
+     }
+
+     /**
+      * Auth User Details
+      *@return array
+      */
+    public function userDetails()
     {
-        $role= Role::with('rolePermissions')->find(auth()->user()->role_id);
+        try{
 
-        $permissions = $role->rolePermissions->map(function($per){
-            return[
-                'id'=>$per->id,
-                'name'=>$per->name
-            ];
-        });
+            $user = User::with(['permissions','role'])->find(auth()->user()->id);
+            return successResponse(new AuthResource($user));
 
-        return $permissions;
-    }
-
-    /**
-    * get user permissions
-    * @return array
-     */
-
-    public function userPermissions()
-    {
-        $permissionsList=User::with('permissions')->where('id',auth()->user()->id)->get();
-
-       $permissions= $permissionsList->map(function($permission){
-            $perm = [];
-           foreach($permission->permissions as $per)
-           {
-                array_push($perm,['id'=>$per->id,'name' => $per->name]);
-           }
-               return $perm;
-       });
-
-       return $permissions;
-
+        }catch(Exception $e)
+        {
+            Log::info('Error in AuthController userDetails:'.$e);
+            return errorMessage($e->getMessage(),500);
+        }
     }
 }
