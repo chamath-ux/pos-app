@@ -20,7 +20,8 @@ class UserResource extends JsonResource
             'lastName' => $this->last_name,
             'email'    => $this->email,
             'isAdmin'  => ($this->isAdmin == 1) ? 'Yes' : 'No',
-            'userRole' => ($this->role) ? $this->role->name : ''
+            'name'     => $this->whenNotNull($this->name),
+            'userRole' => UserResource::collection('role')
         ];
     }
 }

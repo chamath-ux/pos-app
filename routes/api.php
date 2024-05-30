@@ -14,6 +14,7 @@ Route::group(['prefix'=>'auth'],function(){
 
 Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', [AuthController::class,'logout']);
+        Route::get('user-details',[AuthController::class,'userDetails']);
 
     Route::prefix('permissions')->group(function(){
 

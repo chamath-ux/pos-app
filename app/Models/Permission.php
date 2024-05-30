@@ -20,12 +20,12 @@ class Permission extends Model
         'description'
     ];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-        'pivot',
-        'description'
-    ];
+    // protected $hidden = [
+    //     'created_at',
+    //     'updated_at',
+    //     'pivot',
+    //     'description'
+    // ];
 
 
     public function roles()

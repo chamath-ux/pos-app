@@ -27,12 +27,12 @@ class PermissionService extends BaseController
             $permission = Permission::where('name', $permissionName)->firstOrFail();
             $user->permissions()->syncWithoutDetaching([$permission->id]);
 
-            return  $this->sendResponse('Permission add Successfully.');
+            return  successMessage('Permission add Successfully.');
 
         }catch(Exception $e)
         {
             Log::info('Error in givePermissionTo:'.$e->getMessage());
-            return $this->sendError($e->getMessage(),'',500);
+            return errorMessage($e->getMessage(),500);
         }
 
     }
@@ -53,12 +53,12 @@ class PermissionService extends BaseController
             $permission = Permission::where('name', $permissionName)->firstOrFail();
             $user->permissions()->detach($permission->id);
 
-            return  $this->sendResponse('Permission add Successfully.');
+            return  successMessage('Permission remove Successfully.');
 
         }catch(Exception $e)
         {
             Log::info('Error in removePermissionFrom:'.$e->getMessage());
-            return $this->sendError($e->getMessage(),'',500);
+            return errorMessage($e->getMessage(),500);
         }
 
     }
@@ -104,12 +104,12 @@ class PermissionService extends BaseController
             $permission = Permission::where('name', $permissionName)->firstOrFail();
             $role->rolePermissions()->detach($permission->id);
 
-            return  $this->sendResponse('Permission add Successfully.');
+            return  successMessage('Permission remove Successfully.');
 
         }catch(Exception $e)
         {
             Log::info('Error in removePermissionFromRole:'.$e->getMessage());
-            return $this->sendError($e->getMessage(),'',500);
+            return errorMessage($e->getMessage(),500);
         }
 
     }
@@ -122,56 +122,7 @@ class PermissionService extends BaseController
 
     public function getPermissionList($permission)
     {
-        dd($permission);
-        return  $this->sendResponse(new PermissionResource($permission),'Permission add Successfully.');
-        // $permissions= Permission::with(['users','roles'])->get();
-
-
-        // $permissionList=$permissions->map(function($permission){
-
-        //     $permissions['id'] = $permission->id;
-        //     $permissions['name'] =$permission->name;
-        //     $permissions['permittedUsers'] = $this->permittedUsers($permission->users);
-        //     $permissions['permittedRoles'] = $this->permittedRoles($permission->roles);
-
-        //     return $permissions;
-        // });
-        // return  $permissionList;
-    }
-
-    /**
-     * Get permitted user list
-     * @return array
-     */
-
-    public function permittedUsers($permission)
-    {
-        $permissions = $permission->map(function($user){
-            return [
-                    'id'=>$user->id,
-                    'name'=>$user->getFullNameAttribute(),
-                    'email'=>$user->email
-                    ];
-        });
-
-        return $permissions;
-    }
-
-    /**
-     *
-     * Get Permitted Roles List
-     * @return array
-     */
-
-    public function permittedRoles($permission)
-    {
-        $permissions= $permission->map(function($role){
-            return[
-                'id'=>$role->id,
-                'name'=>$role->name
-            ];
-        });
-
-        return $permissions;
+        // dd($permission);
+        return  successResponse(new PermissionCollection($permission->with(['users','roles'])->get()));
     }
 }

@@ -15,18 +15,13 @@ use App\Http\Requests\RegisterUserRequest;
 
 class AuthController extends BaseController
 {
-    public function login(AuthRequest $request , AuthService $authService)
-    {
+    protected $authService;
 
-        if(!Auth::attempt($request->all()))
-        {
-            return $this->sendError('Credentials not matching');
-        }
+    public function __construct(){ $this->authService = new AuthService(); }
 
-        $user = Auth::user();
-        $success = $authService->getAuthUser();
-        return $this->sendResponse($success, 'User login successfully.');
-    }
+    public function login(AuthRequest $request){ return $this->authService->authUser($request); }
+
+    public function userDetails(){ return $this->authService->userDetails(); }
 
     public function logout(Request $request)
     {
@@ -37,28 +32,7 @@ class AuthController extends BaseController
         ]);
     }
 
-    public function register(RegisterUserRequest $request)
-    {
-        try{
-
-            $user = User::create([
-                'first_name'=>$request['first_name'],
-                'last_name'=>$request['last_name'],
-                'email'=>$request['email'],
-                'password'=>$request['password'],
-                'isAdmin'=> $request['isAdmin']
-            ]);
-
-            $user['token'] = $user->createToken('MyApp',['*'],now()->addWeek())->plainTextToken;
-
-            return $this->sendResponse($user, 'User registered successfully.');
-
-        }catch(Exception $e)
-        {
-            Log::info('Error in AuthController register:'.$e);
-            return $this->sendError('User data not inserted','',500);
-        }
-    }
+    public function register(RegisterUserRequest $request){ return $this->authService->registerUser($request); }
 
 
 }
