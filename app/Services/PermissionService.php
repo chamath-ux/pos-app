@@ -5,8 +5,11 @@ namespace App\Services;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Permission;
+use App\Http\Controllers\BaseController;
+use App\Http\Resources\PermissionResource;
+use App\Http\Resources\PermissionCollection;
 
-class PermissionService
+class PermissionService extends BaseController
 {
   /**
      * Assign a permission to the user.
@@ -15,12 +18,23 @@ class PermissionService
      * @param integer $userId
      * @return void
      */
-    public static function givePermissionTo($userId,$permissionName)
+    public function givePermissionTo($userId,$permissionName)
     {
-        $user = User::find($userId);
+        try{
 
-        $permission = Permission::where('name', $permissionName)->firstOrFail();
-        $user->permissions()->syncWithoutDetaching([$permission->id]);
+            $user = User::find($userId);
+
+            $permission = Permission::where('name', $permissionName)->firstOrFail();
+            $user->permissions()->syncWithoutDetaching([$permission->id]);
+
+            return  $this->sendResponse('Permission add Successfully.');
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in givePermissionTo:'.$e->getMessage());
+            return $this->sendError($e->getMessage(),'',500);
+        }
+
     }
 
     /**
@@ -32,10 +46,21 @@ class PermissionService
      */
     public function removePermissionFrom($userId,$permissionName)
     {
-        $user = User::find($userId);
+        try{
 
-        $permission = Permission::where('name', $permissionName)->firstOrFail();
-        $user->permissions()->detach($permission->id);
+            $user = User::find($userId);
+
+            $permission = Permission::where('name', $permissionName)->firstOrFail();
+            $user->permissions()->detach($permission->id);
+
+            return  $this->sendResponse('Permission add Successfully.');
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in removePermissionFrom:'.$e->getMessage());
+            return $this->sendError($e->getMessage(),'',500);
+        }
+
     }
 
        /**
@@ -45,12 +70,22 @@ class PermissionService
      * @param integer $roleId
      * @return void
      */
-    public static function givePermissionToRole($roleId,$permissionName)
+    public function permissionToRole($roleId,$permissionName)
     {
-        $role = Role::find($roleId);
+        try{
+            $role = Role::find($roleId);
 
-        $permission = Permission::where('name', $permissionName)->firstOrFail();
-        $role->rolePermissions()->syncWithoutDetaching([$permission->id]);
+            $permission = Permission::where('name', $permissionName)->firstOrFail();
+            $role->rolePermissions()->syncWithoutDetaching([$permission->id]);
+
+            return  successMessage('Permission add Successfully.');
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in givePermissionToRole:'.$e->getMessage());
+            return errorMessage($e->getMessage(),500);
+        }
+
     }
 
     /**
@@ -62,10 +97,21 @@ class PermissionService
      */
     public function removePermissionFromRole($roleId,$permissionName)
     {
-        $role = Role::find($roleId);
+        try{
 
-        $permission = Permission::where('name', $permissionName)->firstOrFail();
-        $role->rolePermissions()->detach($permission->id);
+            $role = Role::find($roleId);
+
+            $permission = Permission::where('name', $permissionName)->firstOrFail();
+            $role->rolePermissions()->detach($permission->id);
+
+            return  $this->sendResponse('Permission add Successfully.');
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in removePermissionFromRole:'.$e->getMessage());
+            return $this->sendError($e->getMessage(),'',500);
+        }
+
     }
 
 
@@ -74,21 +120,23 @@ class PermissionService
      * @return array
      */
 
-    public function getPermissionList()
+    public function getPermissionList($permission)
     {
-        $permissions= Permission::with(['users','roles'])->get();
+        dd($permission);
+        return  $this->sendResponse(new PermissionResource($permission),'Permission add Successfully.');
+        // $permissions= Permission::with(['users','roles'])->get();
 
 
-        $permissionList=$permissions->map(function($permission){
+        // $permissionList=$permissions->map(function($permission){
 
-            $permissions['id'] = $permission->id;
-            $permissions['name'] =$permission->name;
-            $permissions['permittedUsers'] = $this->permittedUsers($permission->users);
-            $permissions['permittedRoles'] = $this->permittedRoles($permission->roles);
+        //     $permissions['id'] = $permission->id;
+        //     $permissions['name'] =$permission->name;
+        //     $permissions['permittedUsers'] = $this->permittedUsers($permission->users);
+        //     $permissions['permittedRoles'] = $this->permittedRoles($permission->roles);
 
-            return $permissions;
-        });
-        return  $permissionList;
+        //     return $permissions;
+        // });
+        // return  $permissionList;
     }
 
     /**

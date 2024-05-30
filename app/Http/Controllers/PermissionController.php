@@ -10,91 +10,39 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\BaseController;
 
-class PermissionController extends BaseController
+class PermissionController extends Controller
 {
-    public function givePermission(Request $request ,PermissionService $permission)
+    protected $permissionService;
+
+    public function __construct(){ $this->permissionService = new PermissionService(); }
+
+    public function givePermission(Request $request){ return $this->permissionService->givePermissionTo($request->userId,$request->permission); }
+
+    public function removePermission(Request $request){ return $this->permissionService->removePermissionFrom($request->userId,$request->permission); }
+
+    public function givePermissionToRole(Request $request){ return $this->permissionService->permissionToRole($request->roleId,$request->permission); }
+
+    public function removePermissionFromRole(Request $request){ return $this->permissionService->removePermissionFromRole($request->roleId,$request->permission); }
+
+    public function getAllPermissions(Permission $permission)
     {
-        try{
 
-            $permission->givePermissionTo($request->userId,$request->permission);
-            $success['permission'] = $request->permission;
-            $success['user'] = $request->userId;
+        return $this->permissionService->getPermissionList($permission);
+        // try{
 
-            return $this->sendResponse($success, 'SuccessFully give the permission');
+        //     $permissionList = $permission->getPermissionList();
 
-        }catch(InvalidTokenException $e){
+        //     return $this->sendResponse($permissionList,'The permission list');
 
-            Log::info('Error in PermissionController givePermission:'.$e);
-            return $this->sendError('Token not valid','',500);
+        // }catch(InvalidException $e)
+        // {
+        //     Log::info('Error in PermissionController getAllPermissions:'.$e);
+        //     return $this->sendError('Token not valid','',500);
 
-        }catch(Exception $e)
-        {
-            Log::info('Error in PermissionController givePermission:'.$e);
-            return $this->sendError($e->getMessage(),'',500);
-        }
-
-    }
-
-    public function removePermission(Request $request ,PermissionService $permission)
-    {
-        try{
-
-            $permission->removePermissionFrom($request->userId,$request->permission);
-
-            return $this->sendResponse('','SuccessFully remove the permission');
-
-        }catch(InvalidTokenException $e){
-
-            Log::info('Error in PermissionController removePermission:'.$e);
-            return $this->sendError('Token not valid','',500);
-
-        }catch(Exception $e)
-        {
-            Log::info('Error in PermissionController removePermission:'.$e);
-            return $this->sendError($e->getMessage(),'',500);
-        }
-
-    }
-
-    public function givePermissionToRole(Request $request ,PermissionService $permission)
-    {
-        try{
-
-            $permission->givePermissionToRole($request->roleId,$request->permission);
-            $success['permission'] = $request->permission;
-            $success['role'] = $request->roleId;
-
-            return $this->sendResponse($success, 'SuccessFully give the permission');
-
-        }catch(InvalidTokenException $e){
-
-            Log::info('Error in PermissionController givePermissionToRole:'.$e);
-            return $this->sendError('Token not valid','',500);
-
-        }catch(Exception $e)
-        {
-            Log::info('Error in PermissionController givePermissionToRole:'.$e);
-            return $this->sendError($e->getMessage(),'',500);
-        }
-    }
-
-    public function getAllPermissions(PermissionService $permission)
-    {
-        try{
-
-            $permissionList = $permission->getPermissionList();
-
-            return $this->sendResponse($permissionList,'The permission list');
-
-        }catch(InvalidException $e)
-        {
-            Log::info('Error in PermissionController getAllPermissions:'.$e);
-            return $this->sendError('Token not valid','',500);
-
-        }catch(Exception $e)
-        {
-            Log::info('Error in PermissionController getAllPermissions:'.$e);
-            return $this->sendError($e->getMessage(),'',500);
-        }
+        // }catch(Exception $e)
+        // {
+        //     Log::info('Error in PermissionController getAllPermissions:'.$e);
+        //     return $this->sendError($e->getMessage(),'',500);
+        // }
     }
 }
