@@ -19,11 +19,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::middleware(['permission:assign_permission'])->group(function(){
             Route::post('permission',[PermissionController::class,'givePermission']);
-            Route::post('give-permission-to-role',[PermissionController::class,'givePermissionToRole']);
+            Route::post('role-permission',[PermissionController::class,'givePermissionToRole']);
         });
 
         Route::middleware(['permission:remove_permission'])->group(function(){
             Route::post('remove-permission',[PermissionController::class,'removePermission']);
+            Route::post('remove-role-permission',[PermissionController::class,'removePermissionFromRole']);
         });
 
         Route::get('all-permission-list',[PermissionController::class,'getAllPermissions'])->middleware('permission:show_list');
@@ -43,6 +44,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('create-role',[RoleController::class,'create'])->middleware('permission:create_role');
             Route::post('assign-role-to-user',[RoleController::class,'assignPermissionToUser'])->middleware('permission:assign_role');
             Route::post('delete-role',[RoleController::class,'deleteRole'])->middleware('permission:delete_role');
+            Route::get('role-list',[RoleController::class,'roleList'])->middleware('permission:show_role_list');
 
     });
 });
