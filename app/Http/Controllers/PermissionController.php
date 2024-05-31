@@ -24,25 +24,7 @@ class PermissionController extends Controller
 
     public function removePermissionFromRole(Request $request){ return $this->permissionService->removePermissionFromRole($request->roleId,$request->permission); }
 
-    public function getAllPermissions(Permission $permission)
-    {
+    public function getAllPermissions(Permission $permission){   return $this->permissionService->getPermissionList($permission); }
 
-        return $this->permissionService->getPermissionList($permission);
-        // try{
-
-        //     $permissionList = $permission->getPermissionList();
-
-        //     return $this->sendResponse($permissionList,'The permission list');
-
-        // }catch(InvalidException $e)
-        // {
-        //     Log::info('Error in PermissionController getAllPermissions:'.$e);
-        //     return $this->sendError('Token not valid','',500);
-
-        // }catch(Exception $e)
-        // {
-        //     Log::info('Error in PermissionController getAllPermissions:'.$e);
-        //     return $this->sendError($e->getMessage(),'',500);
-        // }
-    }
+    public function show($permission_id){ return $this->permissionService->show($permission_id); }
 }

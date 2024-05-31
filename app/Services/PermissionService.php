@@ -5,11 +5,10 @@ namespace App\Services;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Permission;
-use App\Http\Controllers\BaseController;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\PermissionCollection;
 
-class PermissionService extends BaseController
+class PermissionService
 {
   /**
      * Assign a permission to the user.
@@ -122,7 +121,36 @@ class PermissionService extends BaseController
 
     public function getPermissionList($permission)
     {
-        // dd($permission);
-        return  successResponse(new PermissionCollection($permission->with(['users','roles'])->get()));
+        try{
+
+            return  successResponse(new PermissionCollection($permission->get()));
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in removePermissionFromRole:'.$e->getMessage());
+            return errorMessage($e->getMessage(),500);
+        }
+
+    }
+
+    public function show($permission_id)
+    {
+        try{
+
+            if(!Permission::find($permission_id))
+            {
+                throw new Exception('This Permission not exists');
+            }
+
+            $permission = Permission::with(['roles','users'])->find($permission_id);
+
+            return successResponse(new PermissionResource($permission));
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in removePermissionFromRole:'.$e->getMessage());
+            return errorMessage($e->getMessage(),500);
+        }
+
     }
 }

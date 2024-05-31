@@ -19,4 +19,6 @@ class UserController extends Controller
     public function users(User $user){ return $this->userService->userList($user); }
 
     public function deleteUser(Request $request ,User $user){ return $this->userService->delete($request, $user); }
+
+    public function show($user_id){ return $this->userService->show($user_id); }
 }
