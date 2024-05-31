@@ -20,7 +20,7 @@ class AuthService
     {
         try{
 
-            if(!Auth::attempt($request->all()))
+            if(!Auth::attempt($request->validated()))
             {
                 throw new Exception('Credentials not matching');
             }
@@ -46,7 +46,7 @@ class AuthService
      {
         try{
 
-            $user = User::create($request->all());
+            $user = User::create($request->validated());
 
             if(!$user)
             {

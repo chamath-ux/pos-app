@@ -21,7 +21,8 @@ class UserResource extends JsonResource
             'email'    => $this->email,
             'isAdmin'  => ($this->isAdmin == 1) ? 'Yes' : 'No',
             'name'     => $this->whenNotNull($this->name),
-            'userRole' => UserResource::collection('role')
+            'userRole' => new RoleResource($this->whenLoaded('role')),
+            'permissions'=>new PermissionCollection($this->whenLoaded('permissions'))
         ];
     }
 }

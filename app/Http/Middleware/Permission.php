@@ -5,10 +5,9 @@ namespace App\Http\Middleware;
 use Closure;
 use CheckPermission;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BaseController;
 use Symfony\Component\HttpFoundation\Response;
 
-class Permission extends BaseController
+class Permission
 {
     /**
      * Handle an incoming request.
@@ -19,7 +18,7 @@ class Permission extends BaseController
     {
         if(!CheckPermission::hasPermission($permission))
         {
-            return $this->sendError('You have no permission for this action','',403);
+            return errorMessage('You have no permission for this action',403);
         }
         return $next($request);
     }

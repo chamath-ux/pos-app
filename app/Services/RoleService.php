@@ -12,6 +12,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\UserCollection;
+use App\Actions\AssignRoleToUserAction;
 
 class RoleService
 {
@@ -19,7 +20,7 @@ class RoleService
     {
         try{
 
-            $role= Role::create($request->all());
+            $role= Role::create($request->validated());
             return successMessage('Created Role Successfully.',200);
 
             }catch(InvalidTokenException $e){
@@ -38,9 +39,14 @@ class RoleService
     {
         try{
 
-            $role= User::find($request->userId);
-            $role->role_id = $request->roleId;
-            $role->save();
+            $assignRole = new AssignRoleToUserAction();
+
+            if(!User::find($request->userId))
+            {
+                throw new Exception('This user not exists');
+            }
+
+            $assignRole->execute($request);
 
             return successMessage('Successfully Updated');
 

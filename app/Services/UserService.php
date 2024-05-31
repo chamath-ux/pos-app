@@ -17,7 +17,7 @@ class UserService
     {
         try{
 
-            $users = $user->create($request->all());
+            $users = $user->create($request->validated());
             return successMessage('Created User Successfully.',200);
 
         }catch(InvalidTokenException $e){
@@ -36,7 +36,7 @@ class UserService
     {
         try{
 
-            $users = $user->all(); // Fetch users from the database
+            $users = $user->get(); // Fetch users from the database
             return successResponse(new UserCollection($users), 200);
 
         }catch(Exception $e)
@@ -62,6 +62,25 @@ class UserService
 
             $user->destroy($request->userId);
             return successMessage('Successfully Deleted the user.',200);
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in UserController deleteUser:'.$e->getMessage());
+            return errorMessage($e->getMessage(),500);
+        }
+    }
+
+    public function show($user_id)
+    {
+        try{
+
+            if(!User::find($user_id))
+            {
+                throw new Exception('This User dose not exists');
+            }
+
+            $user=User::with(['permissions','role'])->find($user_id);
+            return successResponse(new UserResource($user),200);
 
         }catch(Exception $e)
         {
