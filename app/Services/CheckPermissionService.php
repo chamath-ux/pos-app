@@ -18,6 +18,8 @@ class CheckPermissionService
         $user = User::find(auth()->user()->id);
         $role= Role::find(auth()->user()->role_id);
 
+        if($role === null){ return false; }
+
         return $user->admin() || $user->permissions()->where('name', $permissionName)->exists() || $role->rolePermissions()->where('name', $permissionName)->exists();
     }
  }
