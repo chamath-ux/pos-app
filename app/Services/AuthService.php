@@ -79,4 +79,21 @@ class AuthService
             return errorMessage($e->getMessage(),500);
         }
     }
+
+    public function resetPassword($request)
+    {
+        try{
+
+            $user = User::find(auth()->user()->id);
+            $user->password=$request->password;
+            $user->save();
+
+            return successMessage('Password Successfully reset');
+
+        }catch(Exception $e)
+        {
+            Log::info('Error in AuthController resetPassword:'.$e);
+            return errorMessage($e->getMessage(),500);
+        }
+    }
 }

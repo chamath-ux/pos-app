@@ -126,6 +126,11 @@ return [
     'aliases' => [
         // Other aliases
         'CheckPermission' => App\Facades\PermissionsCheckFacade::class,
+        'PermissionService' => App\Facades\PermissionFacade::class,
+        'RoleService' => App\Facades\RoleFacade::class,
+        'AuthService' => App\Facades\AuthFacade::class,
+        'UserService' => App\Facades\UserFacade::class,
+        'ProductService' => App\Facades\ProductFacade::class
     ],
 
 ];
